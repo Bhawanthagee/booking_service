@@ -1,8 +1,12 @@
 package com.bawa.booking_service.service;
 
+import com.bawa.booking_service.BookingResults;
+import com.bawa.booking_service.dto.req.BookCreateReq;
+
+import java.util.List;
+
 public interface BookingService {
-    BookingRes create(CreateBookingReq req);
-    BookingRes updateStatus(Integer id, BookingStatus status);
-    List<BookingRes> listByMentee(Integer menteeId);
-    List<BookingRes> listByMentor(Integer mentorId)
+    void createBooking(BookCreateReq bookCreateReq);
+
+    List<BookingResults> getAllByMentee(Integer menteeId);
 }
