@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BookCreateReq {
+
     private Integer userId;
 
     private Integer slotId;
