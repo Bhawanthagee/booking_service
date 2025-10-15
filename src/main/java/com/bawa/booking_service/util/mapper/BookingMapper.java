@@ -13,4 +13,6 @@ public interface BookingMapper {
     Booking saveReqToEntity(BookCreateReq bookCreateReq);
 
     List<BookingResDto> customResultToDto(List<BookingResults> result);
+
+    BookingResDto resultToRes(BookingResults result);
 }

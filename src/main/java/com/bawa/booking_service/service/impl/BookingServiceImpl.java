@@ -13,19 +13,23 @@ import com.bawa.booking_service.exception.SlotAlreadyBookedException;
 import com.bawa.booking_service.repository.BookingRepository;
 import com.bawa.booking_service.service.BookingService;
 import com.bawa.booking_service.service.SlotService;
+import com.bawa.booking_service.util.MSCalls;
 import com.bawa.booking_service.util.mapper.BookingMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BookingServiceImpl implements BookingService {
     @Autowired
     BookingRepository bookingRepository;
@@ -37,6 +41,8 @@ public class BookingServiceImpl implements BookingService {
     WebClient webClient;
     @Autowired
     SlotService slotService;
+    @Autowired
+    MSCalls msCalls;
 
     @Override
     public void createBooking(BookCreateReq bookCreateReq) {
@@ -70,13 +76,7 @@ public class BookingServiceImpl implements BookingService {
         List<Integer> mentorIds = resDtoList.stream()
                 .map(BookingResDto::getMentorId)
                 .toList();
-
-        StandardResponse response = webClient.post()
-                .uri("/get_mentors_by_id")
-                .bodyValue(mentorIds)
-                .retrieve()
-                .bodyToMono(StandardResponse.class)
-                .block();
+        StandardResponse response = msCalls.callMCWithBodyValues("/get_mentors_by_id",mentorIds);
 
         Object data = response.getData();
         ObjectMapper objMapper = new ObjectMapper();
@@ -116,5 +116,119 @@ public class BookingServiceImpl implements BookingService {
                     .build());
         }
         return "Booking " + status;
+    }
+
+    @Override
+    public List<BookingResDto> getAllByMentor(Integer mentorId) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<BookingResults> result = bookingRepository.getAllByMentor(mentorId);
+        List<BookingResDto> resDtoList = bookingMapper.customResultToDto(result);
+
+        List<Integer> mentorIds = resDtoList.stream()
+                .map(BookingResDto::getMentorId)
+                .toList();
+
+        StandardResponse response = msCalls.callMCWithBodyValues("/get_mentors_by_id",mentorIds);
+
+        Object data = response.getData();
+        ObjectMapper objMapper = new ObjectMapper();
+        List<UserResponse> mentors = objMapper.convertValue(
+                data,
+                new TypeReference<List<UserResponse>>() {
+                }
+        );
+
+        Map<Integer, UserResponse> mentorMap = mentors.stream()
+                .collect(Collectors.toMap(UserResponse::getId, m -> m));
+
+        resDtoList.forEach(dto -> {
+            UserResponse mentor = mentorMap.get(dto.getMentorId());
+            if (mentor != null) {
+                dto.setMentorName(mentor.getName());
+            }
+        });
+
+        return resDtoList;
+    }
+
+    @Override
+    public BookingResDto getBookingByIdMentor(Integer bookingId) {
+        BookingResults result = bookingRepository.getByBookingId(bookingId);
+
+        log.info(result.getMentorId().toString());
+
+//        StandardResponse response = msCalls.callMCWithReqParam("", "appUserId", result.getMentorId());
+
+        List<Integer>ids = new ArrayList<>();
+        ids.add(result.getMentorId());
+        ids.add(result.getMenteeId());
+
+        StandardResponse response = msCalls.callMCWithBodyValues("/get_mentors_by_id",ids);
+
+
+        Object data = response.getData();
+        ObjectMapper objMapper = new ObjectMapper();
+        List<UserResponse> users = objMapper.convertValue(
+                data,
+                new TypeReference<List<UserResponse>>() {
+                }
+        );
+        String mentorName = users.stream()
+                .filter(u -> u.getId().equals(result.getMentorId()))
+                .map(UserResponse::getName)
+                .findFirst()
+                .orElse("Unknown Mentor");
+
+        String menteeName = users.stream()
+                .filter(u -> u.getId().equals(result.getMenteeId()))
+                .map(UserResponse::getName)
+                .findFirst()
+                .orElse("Unknown Mentee");
+
+        BookingResDto resDto = bookingMapper.resultToRes(result);
+        resDto.setMentorName(mentorName);
+        resDto.setMenteeName(menteeName);
+
+        return resDto;
+    }
+
+    @Override
+    public BookingResDto getBookingByIdMentee(Integer bookingId) {
+        BookingResults result = bookingRepository.getByBookingId(bookingId);
+
+        log.info(result.getMentorId().toString());
+
+        List<Integer>ids = new ArrayList<>();
+        ids.add(result.getMentorId());
+        ids.add(result.getMenteeId());
+
+        StandardResponse response = msCalls.callMCWithBodyValues("/get_mentors_by_id",ids);
+
+
+        Object data = response.getData();
+        ObjectMapper objMapper = new ObjectMapper();
+        List<UserResponse> users = objMapper.convertValue(
+                data,
+                new TypeReference<List<UserResponse>>() {
+                }
+        );
+        String mentorName = users.stream()
+                .filter(u -> u.getId().equals(result.getMentorId()))
+                .map(UserResponse::getName)
+                .findFirst()
+                .orElse("Unknown Mentor");
+
+        String menteeName = users.stream()
+                .filter(u -> u.getId().equals(result.getMenteeId()))
+                .map(UserResponse::getName)
+                .findFirst()
+                .orElse("Unknown Mentee");
+
+        BookingResDto resDto = bookingMapper.resultToRes(result);
+        resDto.setMentorName(mentorName);
+        resDto.setMenteeName(menteeName);
+
+        return resDto;
     }
 }

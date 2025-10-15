@@ -17,6 +17,7 @@ public class BookingResDto {
     private Integer menteeId;
     private Integer mentorId;
     private String mentorName;
+    private String menteeName;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;

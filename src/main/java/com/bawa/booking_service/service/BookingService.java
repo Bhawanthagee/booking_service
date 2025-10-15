@@ -12,4 +12,10 @@ public interface BookingService {
     List<BookingResDto> getAllByMentee(Integer menteeId, Integer mentorId);
 
     String cancelOrConfirmBooking(Integer bookingId, BookingStatus status);
+
+    List<BookingResDto> getAllByMentor(Integer mentorId);
+
+    BookingResDto getBookingByIdMentor(Integer bookingId);
+
+    BookingResDto getBookingByIdMentee(Integer bookingId);
 }

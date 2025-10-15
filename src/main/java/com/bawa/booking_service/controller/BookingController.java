@@ -41,6 +41,31 @@ public class BookingController {
                 new StandardResponse("Success",bookingService.getAllByMentee(menteeId,mentorId)),HttpStatus.OK
         );
     }
+    @GetMapping("Get_by_mentor")
+    public ResponseEntity<StandardResponse>getByMentor(
+            @RequestParam Integer mentorId
+    ){
+        return new ResponseEntity<>(
+                new StandardResponse("Success",bookingService.getAllByMentor(mentorId)),HttpStatus.OK
+        );
+    }
+    @GetMapping("Get_by_id")
+    public ResponseEntity<StandardResponse>getByBookingId(
+            @RequestParam Integer bookingId
+    ){
+        return new ResponseEntity<>(
+                new StandardResponse("Success",bookingService.getBookingByIdMentor(bookingId)),HttpStatus.OK
+        );
+    }
+    @GetMapping("Get_by_id_mentee")
+    public ResponseEntity<StandardResponse>getByBookingIdMentee(
+            @RequestParam Integer bookingId
+    ){
+        return new ResponseEntity<>(
+                new StandardResponse("Success",bookingService.getBookingByIdMentee(bookingId)),HttpStatus.OK
+        );
+    }
+
     @PatchMapping("confirm_cancel_booking")
     public ResponseEntity<StandardResponse>cancelOrConfirmBooking(
             @RequestParam Integer bookingId,
