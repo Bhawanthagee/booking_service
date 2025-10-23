@@ -1,6 +1,6 @@
 package com.bawa.booking_service.service.impl;
 
-import com.bawa.booking_service.BookingResults;
+import com.bawa.booking_service.util.results.BookingResults;
 import com.bawa.booking_service.contrains.BookingStatus;
 import com.bawa.booking_service.dto.req.BookCreateReq;
 import com.bawa.booking_service.dto.req.SlotUpdateReq;

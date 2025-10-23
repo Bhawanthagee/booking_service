@@ -1,6 +1,6 @@
 package com.bawa.booking_service.repository;
 
-import com.bawa.booking_service.BookingResults;
+import com.bawa.booking_service.util.results.BookingResults;
 import com.bawa.booking_service.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

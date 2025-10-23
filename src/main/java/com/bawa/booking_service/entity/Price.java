@@ -19,10 +19,9 @@ public class Price {
     @Column(name = "mentor_id", nullable = false)
     private Integer mentorId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", nullable = false)
-    private ServiceEntity service;
+    @Column(name = "service_id")
+    private Integer serviceId;
 
-    @Column(nullable = false)
+    @Column(name="amount")
     private Double amount;
 }

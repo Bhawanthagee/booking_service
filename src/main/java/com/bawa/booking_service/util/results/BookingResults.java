@@ -1,4 +1,4 @@
-package com.bawa.booking_service;
+package com.bawa.booking_service.util.results;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
